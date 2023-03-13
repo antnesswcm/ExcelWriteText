@@ -24,14 +24,18 @@ func processFile(filename string, column int) (err error) {
 				continue
 			}
 			content = ""
+			//println(len(row.Cells))
+			//continue
 			for i := column + 1; i < len(row.Cells); i++ {
 				fileContentCell := row.Cells[i]
 				if fileContentCell.Value != "" {
 					fileContent := fileContentCell.Value
 					content += fileContent
-				} else {
+				} else if blankStop {
 					break
 				}
+			}
+			if content != "" {
 				err = writeFile(fileName, content)
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
