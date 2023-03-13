@@ -76,4 +76,5 @@ func processParams() {
 			columnListNum = append(columnListNum, 0)
 		}
 	}
+	// todo 处理-s参数
 }

@@ -1,6 +1,11 @@
 package main
 
-import "flag"
+import (
+	"flag"
+	"fmt"
+	"os"
+	"path/filepath"
+)
 
 func parseFlags() {
 	flag.StringVar(&files, "f", "", "以逗号分隔的文件列表，不可与[files]同时使用")
@@ -20,4 +25,9 @@ func parseFlags() {
 	flag.Parse()
 	// 游离参数
 	fileList = flag.Args()
+}
+func usage() {
+	fmt.Fprintf(os.Stderr, "用法: %s [选项] [files]\n", filepath.Base(os.Args[0]))
+	fmt.Fprintln(os.Stderr, "选项:")
+	flag.PrintDefaults()
 }
