@@ -8,12 +8,14 @@ var letterToNum = map[rune]int{}
 var fileList []string
 var columnListNum []int
 var columnList []string
+var scopeList []string
+var scopeListNum [][]int
 
 var (
 	files     string
 	columns   string
 	blankStop bool
-	scope     string
+	scopes    string
 	extension string
 	outpath   string
 	help      bool

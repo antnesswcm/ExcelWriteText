@@ -8,44 +8,73 @@ import (
 
 func processFiles() {
 	for i, file := range fileList {
+		// todo 使用并发处理每个文件
 		column := columnListNum[i] // 同时遍历columnListNum
-		// todo 处理s参数走的逻辑
-		err := processFile(file, column)
+		scope := scopeListNum[i]   // 同时遍历scopeListNum
+
+		err := processFile(file, column, scope)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
+			fmt.Fprintf(os.Stderr, "文件%s读取失败:\n%s\n", file, err)
 			continue
 		}
 	}
 }
-func processFile(filename string, column int) (err error) {
+
+func processFile(filename string, column int, scope []int) (err error) {
 	var fileName string
 	var content string
 	xlFile, err := xlsx.OpenFile(filename)
 	if err != nil {
 		return err
 	}
-
 	for _, sheet := range xlFile.Sheets {
+		//rows := len(sheet.Rows)
+		emptyRow := 0
 		for _, row := range sheet.Rows {
-			// 读取第column作为文件名，后面的列作为文件内容
-			fileNameCell := row.Cells[column]
-			if fileNameCell.Value != "" {
-				fileName = fileNameCell.Value
-			} else {
-				continue
+			// 判断是否为空行
+			if len(row.Cells) == 0 {
+				emptyRow++
+				continue // 跳过空行
 			}
-			content = ""
 			//println(len(row.Cells))
 			//continue
-			for i := column + 1; i < len(row.Cells); i++ {
-				fileContentCell := row.Cells[i]
-				if fileContentCell.Value != "" {
-					fileContent := fileContentCell.Value
+			// scope 参数处理
+			if scope[0] == -1 {
+				scope[0] = column + 1
+			}
+			if scope[1] == -1 {
+				scope[1] = len(row.Cells) - 1
+			}
+			// 判断column与scope是否出界
+			if column > len(row.Cells)-1 {
+				// todo 说明
+				break
+			}
+			if scope[0] > scope[1] {
+				// todo 说明
+				break
+			} else if len(row.Cells)-1 < scope[1] {
+				// todo 说明
+				break
+			}
+
+			// 读取文件名
+			fileName = row.Cells[column].Value
+			if fileName == "" {
+				continue
+			}
+
+			// 读取内容
+			content = ""
+			for i := scope[0]; i <= scope[1]; i++ {
+				fileContent := row.Cells[i].Value
+				if fileContent != "" {
 					content += fileContent
 				} else if blankStop {
 					break
 				}
 			}
+			// 处理写入
 			if content != "" {
 				err = writeFile(fileName, content)
 				if err != nil {
@@ -57,5 +86,3 @@ func processFile(filename string, column int) (err error) {
 	}
 	return nil
 }
-
-// todo 新的列处理方法

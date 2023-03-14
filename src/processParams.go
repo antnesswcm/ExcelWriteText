@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 	"unicode"
 )
@@ -55,20 +56,20 @@ func processParams() {
 			os.Exit(1)
 		}
 		// 使用映射关系将字符串映射为数字
-		for _, i := range columnList {
+		for _, v := range columnList {
 			// 判断字符串是否只包含一个字符
-			if len(i) != 1 {
-				fmt.Fprintf(os.Stderr, "%s参数解析失败！", i)
+			if len(v) != 1 {
+				fmt.Fprintf(os.Stderr, "%s参数解析失败！", v)
 				os.Exit(1)
 			}
 
 			// 判断该字符是否为字母
-			if !unicode.IsLetter(rune(i[0])) {
-				fmt.Fprintf(os.Stderr, "%s参数解析失败！", i)
+			if !unicode.IsLetter(rune(v[0])) {
+				fmt.Fprintf(os.Stderr, "%s参数解析失败！", v)
 				os.Exit(1)
 			}
-			i = strings.ToLower(i)
-			columnListNum = append(columnListNum, letterToNum[rune(i[0])])
+			v = strings.ToLower(v)
+			columnListNum = append(columnListNum, letterToNum[rune(v[0])])
 		}
 	} else {
 		// 生成0 columnListNum
@@ -76,5 +77,36 @@ func processParams() {
 			columnListNum = append(columnListNum, 0)
 		}
 	}
-	// todo 处理-s参数
+	scopeList = strings.Split(scopes, ",")
+	for _, v := range scopeList {
+		r := regexp.MustCompile(`(?i)^[a-z]-[a-z]$`)
+		switch {
+		// 判断是否为空
+		case v == "":
+			scopeListNum = append(scopeListNum, []int{-1, -1})
+		// 是否单个字母
+		case len(v) == 1 && unicode.IsLetter(rune(v[0])):
+			v = strings.ToLower(v)
+			n := letterToNum[rune(v[0])]
+			scopeListNum = append(scopeListNum, []int{n, -1})
+		case r.MatchString(v):
+			v = strings.ToLower(v)
+			n1 := letterToNum[rune(v[0])]
+			n2 := letterToNum[rune(v[2])]
+			scopeListNum = append(scopeListNum, []int{n1, n2})
+
+		default:
+			fmt.Fprintf(os.Stderr, "%s参数解析失败！", v)
+			os.Exit(1)
+		}
+	}
+	if len(scopeListNum) > len(fileList) {
+		fmt.Fprintf(os.Stderr, "指定的数据列数量大于处理的文件数量！")
+		os.Exit(1)
+	} else if len(scopeListNum) < len(fileList) {
+		fmt.Fprintf(os.Stderr, "指定的数据列数量小于处理的文件数量！将自动匹配")
+		for i := len(scopeListNum); i < len(fileList); i++ {
+			scopeListNum = append(scopeListNum, []int{-1})
+		}
+	}
 }
