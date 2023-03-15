@@ -11,7 +11,7 @@ func parseFlags() {
 	flag.StringVar(&files, "f", "", "以逗号分隔的文件列表，不可与[files]同时使用")
 
 	flag.StringVar(&columns, "c", "", "以逗号分隔的列地址列表如:\"-c a,b\"")
-	flag.StringVar(&scopes, "s", "", "以逗号分隔的列地址范围如:\"-c a-b,c-d\"")
+	flag.StringVar(&scopes, "s", "", "以逗号分隔的列地址范围如:\"-s a-b,c-d\"")
 
 	flag.StringVar(&extension, "e", "txt", "指定文件后缀名")
 	flag.StringVar(&outpath, "o", "./output", "指定输出文件夹")
