@@ -16,9 +16,9 @@ func parseFlags() {
 	flag.StringVar(&extension, "e", "txt", "指定文件后缀名")
 	flag.StringVar(&outpath, "o", "./output", "指定输出文件夹")
 
-	flag.BoolVar(&blankStop, "b", false, "遇见空单元格默认继续，使用\"-b=true\"停止")
+	flag.BoolVar(&blankStop, "b", false, "遇见空单元停止")
 	flag.BoolVar(&help, "h", false, "显示帮助信息")
-	flag.BoolVar(&helpLong, "help", false, "显示帮助信息")
+	flag.BoolVar(&help, "help", false, "显示帮助信息")
 
 	// 自定义打印帮助信息的格式
 	flag.Usage = usage

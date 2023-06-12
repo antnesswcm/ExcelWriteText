@@ -11,7 +11,7 @@ import (
 
 func processParams() {
 	// 如果出现 -h 或 --help 标志，打印帮助信息并退出程序
-	if help || helpLong {
+	if help {
 		flag.Usage()
 		os.Exit(0)
 	}
